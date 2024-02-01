@@ -6,7 +6,7 @@ import Home from "./pages/Home";
 import Download from "./pages/Download";
 import Tools from "./pages/Tools"
 
-import Container from "react-bootstrap/esm/Container";
+import {Grid} from "@mui/material"
 
 const styles = {
     head: {
@@ -39,12 +39,12 @@ export default function PortfolioContainer() {
   
     return (
     
-      <Container style={styles.head}>
+      <Grid container xs={12} direction="column" justifyContent="center" alignItems="center">
         {/* <h1 style={styles.siteName}>SB County Active Transportation Data Hub</h1> */}
         
         <NavTabs currentPage={currentPage} handlePageChange={handlePageChange} />
         {renderPage()}
-      </Container>
+      </Grid>
 
        
         
