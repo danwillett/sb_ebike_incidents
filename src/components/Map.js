@@ -1,26 +1,31 @@
-import React, {useEffect, useRef, useState} from "react";
+import React, {useEffect, useRef, useState, useContext} from "react";
 import Map from '@arcgis/core/Map.js'
 import MapView from '@arcgis/core/views/MapView.js'
-import Query from '@arcgis/core/rest/support/Query.js'
-import GraphicsLayer from '@arcgis/core/layers/GraphicsLayer.js'
 import FeatureLayer from '@arcgis/core/layers/FeatureLayer.js'
-import FeatureService from '@arcgis/core/rest/featureService/FeatureService.js'
-import Editor from '@arcgis/core/widgets/Editor.js'
-import Graphic from '@arcgis/core/Graphic.js'
-import Expand from '@arcgis/core/widgets/Expand.js'
-import MapForm from "./MapForm";
-import { Box, Grid, Checkbox, Typography, TextField, FormGroup, FormLabel, FormControl, FormControlLabel, Select, InputLabel, MenuItem, Button, RadioGroup, Radio, Modal} from "@mui/material";
+import PictureMarkerSymbol from '@arcgis/core/symbols/PictureMarkerSymbol.js'
 
+import Graphic from '@arcgis/core/Graphic.js'
+import GraphicsLayer from '@arcgis/core/layers/GraphicsLayer.js'
+import Expand from '@arcgis/core/widgets/Expand.js'
+
+import InfoPanel from "./widgets/InfoPanel";
+import { MapContext } from "../MapContext";
+import { Grid } from "@mui/material";
 
 
 export default function EbikeMap() {
 
+  const {map, setMap, view, setView} = useContext(MapContext)
+
   const mapRef = useRef()
+  const infoRef = useRef()
   const [showForm, setShowForm] = useState(false)
   const [incidentData, setIncidentData] = useState(null)
-  const [map, setMap] = useState(null)
-  const [view, setView] = useState(null)
-  const [clickedCoordinates, setClickedCoordinates] = useState(null)
+
+  // const [map, setMap] = useState(null)
+  // const [view, setView] = useState(null)
+  // const [lat, setLat] = useState(null)
+  // const [long, setLong] = useState(null)
   
 
   const incidentLayerUrl = "https://donkey.grit.ucsb.edu/server/rest/services/Hosted/sb_ebike_safety/FeatureServer"
@@ -28,13 +33,31 @@ export default function EbikeMap() {
   // load incident portal layer as service layer
   // layer is not accessible through portal (sharing = organization), but public data collection is enabled
   const loadIncidents = async () => {
-    // const incidentService = new FeatureService({
-    //   url: incidentLayerUrl
-    // });
-    // await incidentService.load();
-    // console.log(incidentService)
+
+    const pictureSymbol = new PictureMarkerSymbol({
+      url: `${process.env.PUBLIC_URL}/pictures/collision_icon.png`,
+      width: 20,
+      height: 20,
+    });
+
+    const popup = {
+      title: "Ebike Incident",
+      content: "<b>Incident Date:</b> {incident_date}<br><b>Incident Type:</b> {incident_type}<br><b>Collision Object:</b> {collision_object}<br><b>Description:</b> {description}",
+    }
+
+    const incidentRenderer = {
+      type: "simple",
+      symbol: pictureSymbol,
+
+    }
+
+
+
     const ebikeLayer = new FeatureLayer({
-      url: incidentLayerUrl
+      url: incidentLayerUrl,
+      renderer: incidentRenderer,
+      outFields: ["incident_date", "incident_type", "collision_object", "description"],
+      popupTemplate: popup
     })
     console.log(ebikeLayer)
     
@@ -55,38 +78,8 @@ export default function EbikeMap() {
             container: mapRef.current,
         });
 
-        const editor = new Editor({
-          view: newView,
-          allowedWorkflows: "create",
-          headingLevel: 1,
-        });
-
-        editor.label = "NEWOEKNOWEKNFR"
-
-        editor.visibleElements = {
-          createFeaturesSection: true,
-          editFeaturesSection: false,
-          snappingControls: false,
-          snappingControlsElements: false,
-          
-          
-        }
-
-        
-
-        newView.ui.add(editor, "top-right")
-
-        newView.on("click", (event) => {
-        // Get the clicked point's geographic coordinates
-        // I want a little bloom graphic on a click
-        const clickedPoint = newView.toMap(event);
-        const { longitude, latitude } = clickedPoint;
-
-
-      
-        setClickedCoordinates({latitude, longitude})
-        setShowForm(true)
-        })
+        const infoDiv = document.getElementById("infoDiv")
+          newView.ui.add([infoDiv], "top-right")
 
         setView(newView)
 
@@ -126,73 +119,17 @@ export default function EbikeMap() {
     }
 }, [map, incidentData])
 
-
-  
-  
-
-
-  // useEffect(()=> {
-  //   loadIncidents()
-    
-  //   const initMap = async () => {
-  //     const [Map, MapImageLayer, MapView, Legend, LayerList, esriConfig] = await loadModules([
-  //       'esri/Map', 
-  //       'esri/layers/MapImageLayer', 
-  //       'esri/views/MapView', 
-  //       'esri/widgets/Legend',
-  //       'esri/widgets/LayerList',
-  //       'esri/config'
-  //     ])
-  //     console.log(esriConfig)
-
-  //     // Create a map
-  //     const map = new Map({
-  //       basemap: 'streets-vector',
-  //     });
-
-  //     // Create a view
-  //     const viewInstance = new MapView({
-  //       map: map,
-  //       center: [-119.7, 34.5],
-  //       zoom: 11,
-  //       container: mapRef.current
-  //     });
-
-  //     viewInstance.on("click", (event) => {
-  //       // Get the clicked point's geographic coordinates
-  //       // I want a little bloom graphic on a click
-  //       const clickedPoint = viewInstance.toMap(event);
-  //       const { longitude, latitude } = clickedPoint;
-
-  //       setClickedCoordinates({latitude, longitude})
-  //       setShowForm(true)
-        
-  //     });
-
-  //   };
-
-
-  //   initMap();
-
-  // }, [])
-
-  const handleCloseForm = () => {
-    setShowForm(false);
-    setClickedCoordinates(null);
-  };
-      
   return (
-    <div>
-      <Grid item style={{
-        width: 
-          "1000px"
-      }}>
+    
+      <Grid item style={{ flex: 1, overflowY: 'auto' }}>
         
-      <div ref={mapRef} style={{ width: "100%", minHeight: "80vh",  boxSizing: "border-box" }}></div>
-
-      {showForm && <MapForm className="esri-widget" id="mapForm" showForm={showForm} coordinates={clickedCoordinates} onClose={handleCloseForm} />}
+      <div ref={mapRef} style={{ width: "100%", height:'100%',  boxSizing: "border-box"}} sx={{flex:1}}></div>
+      <Grid container className="esri-widget" ref={infoRef} id="infoDiv" style={{overflowY: 'auto', maxHeight: '75vh'}}>
+        <InfoPanel />
       </Grid>
-    </div>
+       
+      </Grid>
+
     
     
   )
