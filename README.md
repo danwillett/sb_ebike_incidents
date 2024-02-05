@@ -10,7 +10,7 @@ This is a react application that utilizes the ArcGIS Maps SDK for Javascript to 
 
 # Installation
 
-No installation steps are necessary. To use this application, navigate to ______.
+No installation steps are necessary. To use this application, navigate to https://danwillett.github.io/sb_ebike_incidents.
 
 # Credits
 
