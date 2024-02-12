@@ -52,7 +52,6 @@ export default function EbikeMap() {
     }
 
 
-
     const ebikeLayer = new FeatureLayer({
       url: incidentLayerUrl,
       renderer: incidentRenderer,
@@ -74,7 +73,7 @@ export default function EbikeMap() {
         const newView = new MapView({
             map: map,
             center: [-119.8, 34.45],
-            zoom: 11,
+            zoom: 12,
             container: mapRef.current,
         });
 

@@ -32,10 +32,6 @@ export default function InfoPanel(inputs) {
             )
             }
             
-            
-
-            
-
         </Grid>
        
     )

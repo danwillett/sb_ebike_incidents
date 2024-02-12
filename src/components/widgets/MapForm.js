@@ -76,6 +76,13 @@ export default function MapForm(inputs) {
         setDescription(event.target.value)
     }
 
+    const [terms, setTerms] = useState('')
+    const handleTermsChange = (event) => {
+        setTerms(event.target.checked)
+    }
+
+    const termLink = `${process.env.PUBLIC_URL}/files/Letter of informed consent.pdf`
+
     const [incompleteForm, setIncompleteForm] = useState(null)
     
     const setClosed = inputs.closeForm
@@ -92,7 +99,7 @@ export default function MapForm(inputs) {
               url: incidentLayerUrl
             });
         await incidentService.load();
-
+        
         const incident_timestamp = new Date(
             date.year(),
             date.month(),
@@ -133,7 +140,8 @@ export default function MapForm(inputs) {
 
     const submitForm = () => {
         // check if form is complete
-        const completeForm = description !== '' && incidentWith !== '' && incident !== '' && time !== '' && date !== '' && age !== '' && gender !== '' && lat !== '' && long !== ''
+        // const completeForm = description !== '' && incidentWith !== '' && incident !== '' && time !== '' && date !== '' && age !== '' && gender !== '' && lat !== '' && long !== '' && terms == true
+        const completeForm = terms == true  && time !== '' && date !== ''
         console.log("form completed: ", completeForm)
 
         if (!completeForm) {
@@ -403,17 +411,29 @@ export default function MapForm(inputs) {
                                 maxLength: 500
                             }}
                             />
+                        <FormControlLabel 
+                            control={<Checkbox checked={terms} onChange={handleTermsChange}/>} 
+                            label={
+                                <Typography>
+                                    I am 13 years of age or older and have read and understood the <a href={termLink} target='_blank' rel="noopener noreferrer">terms and conditions.</a>
+                                </Typography>
+                                
+                            }
+                            style={{marginBottom: '20px'}}
+                            
+                            />
+                            
                         
                         {incompleteForm && (
                             <Typography color="error" variant="body2" style={{marginBottom: '10px'}}>
-                            Please fill in all required fields.
+                            Please accept the terms and conditions.
                             </Typography>
                         )}
                         
                         <Grid container direction="row" justifyContent="center">
 
                             {/* <IconButton onClick={closeForm} variant="outlined" color="black" style={{width:"25%"}}><DeleteIcon /></IconButton> */}
-                            <Button onClick={submitForm} variant="contained" style={{minWidth:"25%"}}>Submit Report</Button>
+                            <Button onClick={submitForm} variant="contained" style={{minWidth:"25%", marginBottom: '10px'}}>Submit Report</Button>
 
                         </Grid>
 
