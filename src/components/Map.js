@@ -19,14 +19,8 @@ export default function EbikeMap() {
 
   const mapRef = useRef()
   const infoRef = useRef()
-  const [showForm, setShowForm] = useState(false)
   const [incidentData, setIncidentData] = useState(null)
 
-  // const [map, setMap] = useState(null)
-  // const [view, setView] = useState(null)
-  // const [lat, setLat] = useState(null)
-  // const [long, setLong] = useState(null)
-  
 
   const incidentLayerUrl = "https://donkey.grit.ucsb.edu/server/rest/services/Hosted/sb_ebike_safety/FeatureServer"
   
@@ -52,29 +46,25 @@ export default function EbikeMap() {
     }
 
 
-
     const ebikeLayer = new FeatureLayer({
       url: incidentLayerUrl,
       renderer: incidentRenderer,
       outFields: ["incident_date", "incident_type", "collision_object", "description"],
       popupTemplate: popup
     })
-    console.log(ebikeLayer)
     
     setIncidentData(ebikeLayer)
 
   }
 
   const initMap = () => {
-    console.log("reinitializing")
-    console.log(view)
 
     // Create a view
     if (!view) {
         const newView = new MapView({
             map: map,
             center: [-119.8, 34.45],
-            zoom: 11,
+            zoom: 12,
             container: mapRef.current,
         });
 
@@ -96,8 +86,7 @@ export default function EbikeMap() {
   }, [])
 
   useEffect(() => {
-    console.log(incidentData)
-    console.log(map)
+
     if (incidentData !== null) {
       map.layers = [incidentData]
     }
@@ -108,8 +97,6 @@ export default function EbikeMap() {
         
     if (map !== null) {
         if (map.layers !== null) {
-            console.log(map.layers)
-            console.log("creating map view")
             initMap()
         } else {
 
@@ -124,8 +111,8 @@ export default function EbikeMap() {
       <Grid item style={{ flex: 1, overflowY: 'auto' }}>
         
       <div ref={mapRef} style={{ width: "100%", height:'100%',  boxSizing: "border-box"}} sx={{flex:1}}></div>
-      <Grid container className="esri-widget" ref={infoRef} id="infoDiv" style={{overflowY: 'auto', maxHeight: '75vh'}}>
-        <InfoPanel />
+      <Grid container className="esri-widget" ref={infoRef} id="infoDiv" style={{overflowY: 'auto', maxHeight: '75vh', marginBottom: '5px'}}>
+        <InfoPanel refreshData={loadIncidents}/>
       </Grid>
        
       </Grid>
