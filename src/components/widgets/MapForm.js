@@ -17,9 +17,12 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { TimePicker } from '@mui/x-date-pickers/TimePicker';
 import dayjs from "dayjs";
 import CloseIcon from '@mui/icons-material/Close';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import DeleteIcon from '@mui/icons-material/Delete';
 
 export default function MapForm(inputs) {
+
+    const loadIncidents = inputs.refreshData
 
     const {map, view} = useContext(MapContext)
     const [newIncidentGraphicLayer, setNewIncidentGraphicLayer] = useState(new GraphicsLayer())
@@ -51,10 +54,10 @@ export default function MapForm(inputs) {
     };
     const currentYear = new Date().getFullYear()
     const oldestYear = currentYear - 100
-    const newestYear = currentYear - 10
+    const newestYear = currentYear - 12
     const ageArray = [];
 
-    for (let i = oldestYear; i <= newestYear; i++) {
+    for (let i = newestYear; i >= oldestYear; i--) {
         ageArray.push(i);
     }
 
@@ -76,7 +79,7 @@ export default function MapForm(inputs) {
         setDescription(event.target.value)
     }
 
-    const [terms, setTerms] = useState('')
+    const [terms, setTerms] = useState(false)
     const handleTermsChange = (event) => {
         setTerms(event.target.checked)
     }
@@ -84,6 +87,8 @@ export default function MapForm(inputs) {
     const termLink = `${process.env.PUBLIC_URL}/files/Letter of informed consent.pdf`
 
     const [incompleteForm, setIncompleteForm] = useState(null)
+
+    const [sumbissionError, setSubmissionError] = useState(false)
     
     const setClosed = inputs.closeForm
     const closeForm = () => {
@@ -92,23 +97,42 @@ export default function MapForm(inputs) {
 
     }
 
-    const createIncident = async () => {
-        
+    const submitForm = async () => {
+        // check if form is complete
+        const completeForm = terms == true 
+
+        if (!completeForm) {
+            setIncompleteForm(true)
+            return
+        }
+        // fire post request to service
+        setSubmissionError(false)
         const incidentLayerUrl = "https://donkey.grit.ucsb.edu/server/rest/services/Hosted/sb_ebike_safety/FeatureServer"
         const incidentService = new FeatureService({
               url: incidentLayerUrl
             });
         await incidentService.load();
-        
-        const incident_timestamp = new Date(
-            date.year(),
-            date.month(),
-            date.day(),
-            time.hour(),
-            time.minute()
 
-        ).getTime()
-        console.log(incident_timestamp)
+        let incident_timestamp = null
+        
+        if (date !== '') {
+            incident_timestamp = new Date(
+                date.year(),
+                date.month(),
+                date.day(),
+                time.hour(),
+                time.minute()
+    
+            ).getTime()
+        }
+        let birthyear
+        if (age === '') {
+            birthyear = NaN
+        } else {
+            birthyear = age
+        }
+        
+
         incidentService.applyEdits(
             [
               {
@@ -124,7 +148,7 @@ export default function MapForm(inputs) {
                         attributes: {
                             incident_date: incident_timestamp,
                             incident_type: incident,
-                            birth_year: age,
+                            birth_year: birthyear,
                             gender: gender,
                             gender_additional: genderDescription,
                             collision_object: incidentWith,
@@ -135,22 +159,17 @@ export default function MapForm(inputs) {
                 ]
               }
             ]
-          );
-    }
+          ).then((addedLayer) => {
+            console.log("added new layer: ", addedLayer)
 
-    const submitForm = () => {
-        // check if form is complete
-        // const completeForm = description !== '' && incidentWith !== '' && incident !== '' && time !== '' && date !== '' && age !== '' && gender !== '' && lat !== '' && long !== '' && terms == true
-        const completeForm = terms == true  && time !== '' && date !== ''
-        console.log("form completed: ", completeForm)
-
-        if (!completeForm) {
-            setIncompleteForm(true)
-            return
-        }
-        // fire post request to service
-        createIncident()
-        closeForm()
+            closeForm()
+            loadIncidents()
+          })
+          .catch((error) => {
+            console.error('Error adding new point: ', error)
+            setSubmissionError(true)
+          });
+        
 
     }
     
@@ -176,15 +195,12 @@ export default function MapForm(inputs) {
                 }
 
                 // Get the clicked point's geographic coordinates
-                // I want a little bloom graphic on a click
-                
-                console.log(currentZoom)
+                               
                 view.cursor = "default"
                 const clickedPoint = view.toMap(event);
                 const { longitude, latitude } = clickedPoint;
                 setLat(latitude)
-                setLong(longitude)
-                console.log(latitude, longitude)
+                setLong(longitude)                
     
                 const incidentPoint = new Point({
                     type: "point",
@@ -205,15 +221,12 @@ export default function MapForm(inputs) {
     
                 newIncidentGraphicLayer.add(newIncidentGraphic)
                 map.layers = newIncidentGraphicLayer
-                console.log(map)
-    
-                console.log(selectCoordinates)
+
                 })
             
             return () => {
                 view.cursor = "default"
                 selectCoordinates.remove()
-                console.log(selectCoordinates)
             }
         } 
 
@@ -225,18 +238,24 @@ export default function MapForm(inputs) {
 
     return (
 
-            <Grid container style={{width: '100%', padding:'5%'}}>
+            <Grid container style={{width: '100%', padding:'5%', paddingTop: '3%'}}>
                 
+                    
 
                 {!lat ? (
                     <Grid container direction="column">
-                    {/* <Button
-                        style={{width: '20px'}}
-                    >
-                        <ArrowBackIcon />
-                    </Button> */}
+
+                    <Grid item>
+                        <IconButton
+                        variant='text'
+                        color="black"
+                        onClick={closeForm}>
+                            <ArrowBackIcon />
+                        </IconButton>
+                        
+                    </Grid>
                     
-                    <Typography variant='h6' align='center' style={{width:'100%', paddingTop: '10px', paddingBottom: '10px'}}>Zoom in and select a point on the map</Typography>
+                    <Typography variant='h6' align='center' style={{width:'100%', paddingBottom: '10px'}}>Zoom in and select a point on the map</Typography>
                     </Grid>
                 ) : (
                     <div>
@@ -249,6 +268,7 @@ export default function MapForm(inputs) {
                         </IconButton>
                         
                     </Grid>
+                    
                     <Typography variant='h5' align='center' style={{width: '100%', paddingBottom: '10px'}}>Ebike Incident Report</Typography>
                     <FormControl style={{width: "100%"}}>
                     <Typography variant='h6' align='left' style={{width: '100%', paddingBottom: '10px'}}>Location</Typography>
@@ -367,7 +387,7 @@ export default function MapForm(inputs) {
                     
                                     
                                 >
-                                    <Grid container justifyContent="space-between" alignItems="left" direction="row">
+                                    <Grid container justifyContent="center" alignItems="left" direction="row">
                                         <FormControlLabel value="Collision" control={<Radio />} label="Collision" style={{ width: '45%', marginTop: '5px' }}/>
                                         <FormControlLabel value="Near Miss" control={<Radio />} label="Near Miss" style={{ width: '45%', marginTop: '5px' }}/>
                                         <FormControlLabel value="Fall" control={<Radio />} label="Fall" style={{ width: '45%', marginTop: '5px' }}/>
@@ -386,7 +406,7 @@ export default function MapForm(inputs) {
                                     onChange={handleIncidentWithChange}
                                     
                                 >
-                                    <Grid container justifyContent="space-between" alignItems="left" direction="row">
+                                    <Grid container justifyContent="center" alignItems="left" direction="row">
                                         <FormControlLabel value="Car" control={<Radio />} label="Car" style={{ width: '45%', marginTop: '5px' }}/>
                                         <FormControlLabel value="Pedestrian" control={<Radio />} label="Pedestrian" style={{ width: '45%', marginTop: '5px' }} />
                                         <FormControlLabel value="Bicyclist" control={<Radio />} label="Another Biker" style={{ width: '45%', marginTop: '5px' }}/>
@@ -436,6 +456,12 @@ export default function MapForm(inputs) {
                             <Button onClick={submitForm} variant="contained" style={{minWidth:"25%", marginBottom: '10px'}}>Submit Report</Button>
 
                         </Grid>
+
+                        {sumbissionError && (
+                            <Typography color="error" variant="body2" style={{marginBottom: '10px'}}>
+                            Error adding ebike incident. Please check your network connection or try again later.
+                            </Typography>
+                        )}
 
                         
                     </Grid>

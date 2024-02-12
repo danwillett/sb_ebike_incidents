@@ -3,6 +3,7 @@ import { Box, Grid, Checkbox, Typography, TextField, FormGroup, FormLabel, FormC
 
 import MapForm from './MapForm';
 export default function InfoPanel(inputs) {
+    const loadIncidents = inputs.refreshData
     const [showForm, setShowForm] = useState(false)
 
     const openForm = () => {
@@ -23,12 +24,15 @@ export default function InfoPanel(inputs) {
                     About
                 </Typography>
                 <Typography style={{marginBottom: "10px"}}>
-                    Ebike usage has exploded in Santa Barbara County over the past few years. Let's get some data on this! Where are people crashing, and how?
+                    Ebike usage has exploded in Santa Barbara County over the past few years. Fill out this short survey to help the county identify unsafe areas for ebikers This survey's for you if ride an ebike and have had a crash, fall, or near collision with a car.
+                    <br />
+                    <br />
+                    If you're riding a non-electric bike or would like to add more details to your ebike report, please make it on <a href="https://bikemaps.org/@34.4284344,-119.7228241,12z" target="_blank">BikeMaps.org</a>
                 </Typography>
                 <Button onClick={openForm} variant="outlined" style={{margin: "30px"}}>Report an incident</Button>
             </Grid>
             ): (
-                <MapForm closeForm={closeForm} />
+                <MapForm closeForm={closeForm} refreshData={loadIncidents}/>
             )
             }
             
