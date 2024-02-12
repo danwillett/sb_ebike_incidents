@@ -1,7 +1,7 @@
 {
   "files": {
     "main.css": "/sb_ebike_incidents/static/css/main.7eee306d.css",
-    "main.js": "/sb_ebike_incidents/static/js/main.e0ca16ac.js",
+    "main.js": "/sb_ebike_incidents/static/js/main.dbbb4b21.js",
     "static/js/519.44c11e0d.chunk.js": "/sb_ebike_incidents/static/js/519.44c11e0d.chunk.js",
     "static/js/8023.482bc517.chunk.js": "/sb_ebike_incidents/static/js/8023.482bc517.chunk.js",
     "static/js/4473.c50c0e9d.chunk.js": "/sb_ebike_incidents/static/js/4473.c50c0e9d.chunk.js",
@@ -263,7 +263,7 @@
     "static/js/7213.62078e47.chunk.js": "/sb_ebike_incidents/static/js/7213.62078e47.chunk.js",
     "index.html": "/sb_ebike_incidents/index.html",
     "main.7eee306d.css.map": "/sb_ebike_incidents/static/css/main.7eee306d.css.map",
-    "main.e0ca16ac.js.map": "/sb_ebike_incidents/static/js/main.e0ca16ac.js.map",
+    "main.dbbb4b21.js.map": "/sb_ebike_incidents/static/js/main.dbbb4b21.js.map",
     "519.44c11e0d.chunk.js.map": "/sb_ebike_incidents/static/js/519.44c11e0d.chunk.js.map",
     "8023.482bc517.chunk.js.map": "/sb_ebike_incidents/static/js/8023.482bc517.chunk.js.map",
     "4473.c50c0e9d.chunk.js.map": "/sb_ebike_incidents/static/js/4473.c50c0e9d.chunk.js.map",
@@ -522,6 +522,6 @@
   },
   "entrypoints": [
     "static/css/main.7eee306d.css",
-    "static/js/main.e0ca16ac.js"
+    "static/js/main.dbbb4b21.js"
   ]
 }
