@@ -3,6 +3,7 @@ import Map from '@arcgis/core/Map.js'
 import MapView from '@arcgis/core/views/MapView.js'
 import FeatureLayer from '@arcgis/core/layers/FeatureLayer.js'
 import PictureMarkerSymbol from '@arcgis/core/symbols/PictureMarkerSymbol.js'
+import InfoIcon from '@mui/icons-material/Info';
 
 import Graphic from '@arcgis/core/Graphic.js'
 import GraphicsLayer from '@arcgis/core/layers/GraphicsLayer.js'
@@ -10,7 +11,7 @@ import Expand from '@arcgis/core/widgets/Expand.js'
 
 import InfoPanel from "./widgets/InfoPanel";
 import { MapContext } from "../MapContext";
-import { Grid } from "@mui/material";
+import { Grid, IconButton } from "@mui/material";
 
 
 export default function EbikeMap() {
@@ -19,9 +20,10 @@ export default function EbikeMap() {
 
   const mapRef = useRef()
   const infoRef = useRef()
+  const [viewPanel, setViewPanel] = useState(true)
   const [incidentData, setIncidentData] = useState(null)
 
-
+  
   const incidentLayerUrl = "https://donkey.grit.ucsb.edu/server/rest/services/Hosted/sb_ebike_safety/FeatureServer"
   
   // load incident portal layer as service layer
@@ -69,7 +71,7 @@ export default function EbikeMap() {
         });
 
         const infoDiv = document.getElementById("infoDiv")
-          newView.ui.add([infoDiv], "top-right")
+        newView.ui.add([infoDiv], "top-right")
 
         setView(newView)
 
@@ -106,13 +108,24 @@ export default function EbikeMap() {
     }
 }, [map, incidentData])
 
+
   return (
     
       <Grid item style={{ flex: 1, overflowY: 'auto' }}>
         
       <div ref={mapRef} style={{ width: "100%", height:'100%',  boxSizing: "border-box"}} sx={{flex:1}}></div>
       <Grid container className="esri-widget" ref={infoRef} id="infoDiv" style={{overflowY: 'auto', maxHeight: '75vh', marginBottom: '5px'}}>
-        <InfoPanel refreshData={loadIncidents}/>
+        {viewPanel ? (
+          <InfoPanel refreshData={loadIncidents} setView={setViewPanel}/>
+          ): (
+            <IconButton
+            onClick={() => setViewPanel(!viewPanel)}
+            >
+              <InfoIcon fontSize="medium" />
+            </IconButton>
+            
+          )
+          }
       </Grid>
        
       </Grid>
