@@ -8,6 +8,7 @@ import GraphicsLayer from '@arcgis/core/layers/GraphicsLayer.js'
 import Graphic from '@arcgis/core/Graphic.js'
 import Point from '@arcgis/core/geometry/Point.js'
 import SimpleMarkerSymbol from '@arcgis/core/symbols/SimpleMarkerSymbol.js'
+import Expand from "@arcgis/core/widgets/Expand";
 
 import { Box, Grid, Checkbox, Typography, TextField, FormGroup, FormLabel, FormControl, FormControlLabel, Select, InputLabel, MenuItem, Button, RadioGroup, Radio, IconButton} from "@mui/material";
 import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
@@ -239,8 +240,6 @@ export default function MapForm(inputs) {
     return (
 
             <Grid container style={{width: '100%', padding:'5%', paddingTop: '3%'}}>
-                
-                    
 
                 {!lat ? (
                     <Grid container direction="column">
@@ -255,7 +254,7 @@ export default function MapForm(inputs) {
                         
                     </Grid>
                     
-                    <Typography variant='h6' align='center' style={{width:'100%', paddingBottom: '10px'}}>Zoom in and select a point on the map</Typography>
+                    <Typography variant='h6' align='center' style={{width:'100%', paddingBottom: '10px'}}>Zoom in and select the incident's location on the map</Typography>
                     </Grid>
                 ) : (
                     <div>
@@ -357,13 +356,12 @@ export default function MapForm(inputs) {
                         </Grid>
                         
                         <Typography variant='h6' align='left' style={{width: '100%', paddingBottom: '0px'}}>Incident Details</Typography>
-                        <Grid item style={{marginBottom: '20px'}}>
+                        <Grid container justifyContent="space-between" direction="row"style={{marginBottom: '20px'}} >
                             <LocalizationProvider dateAdapter={AdapterDayjs}>
                                 <DemoContainer components={['DatePicker', 'TimePicker']}>
                                     <DatePicker 
                                         label="Incident Date" 
                                         disableFuture={true}
-                                        
                                         onChange={(newDate) => setDate(newDate)}
                                         />
                                     <TimePicker 

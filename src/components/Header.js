@@ -1,19 +1,20 @@
 import React, {useEffect, useRef, useState} from "react";
-import { Box, Grid, Checkbox, Typography, TextField, FormGroup, FormLabel, FormControl, FormControlLabel, Select, InputLabel, MenuItem, Button, RadioGroup, Radio, Modal} from "@mui/material";
+import { Box, Grid, Checkbox, Typography, useMediaQuery} from "@mui/material";
 
 
 export default function Header() {
-
+    const isSmallScreen = useMediaQuery('(max-width: 600px)')
 
     return (
         <Typography
                 component="h1"
-                variant="h4"
+                variant={isSmallScreen ? "h5" : "h4"}
                 color="inherit"
                 align="center"
-                sx={{ flex: 0, margin: 3, maxHeight:'10vh' }}
+                sx={{ flexShrink: 1, margin: 3, maxHeight:'10vh' }}
               >
-                Santa Barbara Ebike Safety Survey
+
+                {isSmallScreen ? "SB Ebike Safety Survey" : "Santa Barbara Ebike Safety Survey"}
               </Typography>
         
     )
