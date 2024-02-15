@@ -4,14 +4,16 @@ import MapView from '@arcgis/core/views/MapView.js'
 import FeatureLayer from '@arcgis/core/layers/FeatureLayer.js'
 import PictureMarkerSymbol from '@arcgis/core/symbols/PictureMarkerSymbol.js'
 import InfoIcon from '@mui/icons-material/Info';
+import AddBoxOutlinedIcon from '@mui/icons-material/AddBoxOutlined';
 
 import Graphic from '@arcgis/core/Graphic.js'
 import GraphicsLayer from '@arcgis/core/layers/GraphicsLayer.js'
 import Expand from '@arcgis/core/widgets/Expand.js'
 
 import InfoPanel from "./widgets/InfoPanel";
+import ReportPanel from "./widgets/ReportPanel";
 import { MapContext } from "../MapContext";
-import { Grid, IconButton } from "@mui/material";
+import { Grid, IconButton, Button } from "@mui/material";
 
 
 export default function EbikeMap() {
@@ -20,7 +22,9 @@ export default function EbikeMap() {
 
   const mapRef = useRef()
   const infoRef = useRef()
-  const [viewPanel, setViewPanel] = useState(true)
+  const reportRef = useRef()
+  const [viewInfo, setInfoPanel] = useState(true)
+  const [viewReport, setReportPanel] = useState(false)
   const [incidentData, setIncidentData] = useState(null)
 
   
@@ -73,6 +77,9 @@ export default function EbikeMap() {
         const infoDiv = document.getElementById("infoDiv")
         newView.ui.add([infoDiv], "top-right")
 
+        const reportDiv = document.getElementById("reportDiv")
+        newView.ui.add([reportDiv], "top-right")
+
         setView(newView)
 
     }
@@ -115,15 +122,43 @@ export default function EbikeMap() {
         
       <div ref={mapRef} style={{ width: "100%", height:'100%',  boxSizing: "border-box"}} sx={{flex:1}}></div>
       <Grid container className="esri-widget" ref={infoRef} id="infoDiv" style={{overflowY: 'auto', maxHeight: '75vh', marginBottom: '5px'}}>
-        {viewPanel ? (
-          <InfoPanel refreshData={loadIncidents} setView={setViewPanel}/>
-          ): (
-            <IconButton
-            onClick={() => setViewPanel(!viewPanel)}
-            >
-              <InfoIcon fontSize="medium" />
-            </IconButton>
+        {viewInfo ? (
+          <InfoPanel refreshData={loadIncidents} setView={setInfoPanel}/>
+          ): !viewReport ? (
             
+            <Button
+              variant='outlined'
+              color='info'
+              onClick={() => setInfoPanel(!viewInfo)}
+              startIcon={<InfoIcon fontSize="medium" />}
+              style={{padding: '10px', width: '100%', borderRadius: 0, textTransform: 'none'}}
+            >
+              About
+            </Button>
+            
+          ) : (
+            <em></em>
+          )
+          }
+      </Grid>
+      <Grid container className="esri-widget" ref={reportRef} id="reportDiv" style={{overflowY: 'auto', maxHeight: '75vh', marginBottom: '5px'}}>
+        {viewReport ? (
+          <ReportPanel refreshData={loadIncidents} setView={setReportPanel}/>
+          ): !viewInfo ? (
+            
+            <Button
+              variant='outlined'
+              color='secondary'
+              
+              onClick={() => setReportPanel(!viewReport)}
+              startIcon={<AddBoxOutlinedIcon fontSize="medium"/>}
+              style={{padding: '10px', width: '100%', borderRadius: 0, textTransform: 'none'}}
+            >
+              Make Report
+            </Button>
+            
+          ) : (
+            <em></em>
           )
           }
       </Grid>
