@@ -39,7 +39,7 @@ export default function InfoPanel(inputs) {
                     <br />
                     If you're riding a non-electric bike or would like to add more details to your ebike report, please make it on <a href="https://bikemaps.org/@34.4284344,-119.7228241,12z" target="_blank">BikeMaps.org</a>
                 </Typography>
-                <Button onClick={openForm} variant="outlined" style={{margin: "30px"}}>Report an incident</Button>
+                <Button onClick={openForm} variant="outlined" color="secondary" style={{margin: "30px"}}>Report an incident</Button>
             </Grid>
             ): (
                 <MapForm closeForm={closeForm} refreshData={loadIncidents}/>
